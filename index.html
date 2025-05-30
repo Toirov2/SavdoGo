@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manga Bozor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Sarlavha -->
+    <header class="bg-purple-700 text-white p-4 sticky top-0 z-20 shadow-md">
+        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <div class="flex items-center justify-between w-full sm:w-auto">
+                <h1 class="text-2xl font-bold ">Manga Bozor</h1>
+                <div class="flex items-center space-x-4">
+                    <button id="menuToggle" class="sm:hidden text-white focus:outline-none">
+                        <span class="text-lg ">Katalog</span>
+                    </button>
+                    <a href="#" id="mobileCartLink" class="sm:hidden relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span id="mobileCartCount" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    </a>
+                    <a href="#" id="mobileProfileLink" class="sm:hidden text-white hover:underline">Profil</a>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                <div class="relative w-full mt-[20px] sm:w-64">
+                    <input type="text" id="searchInput" placeholder="Manga qidirish..." class="w-full py-2 px-4 rounded-full text-gray-800 focus:outline-none">
+                    <i class="fas fa-search absolute right-3 top-2.5 text-gray-500"></i>
+                </div>
+            </div>
+            <nav class="hidden sm:flex mt-4 sm:mt-0 flex-wrap justify-center sm:justify-end space-x-4">
+                <a href="#" class="hover:underline py-1">Bosh sahifa</a>
+                <a href="#" id="profileLink" class="hover:underline py-1">Profil</a>
+                <a href="#" id="cartLink" class="hover:underline py-1 relative">
+                    Savat
+                    <i class="fas fa-shopping-cart ml-1"></i>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Yon Menyu (Kategoriyalar, Profil, Savat) -->
+    <div id="sideMenu" class="fixed top-0 left-0 h-full w-64 bg-purple-800 text-white p-4 transform -translate-x-full transition-transform z-30 sm:hidden">
+        <button id="closeMenu" class="mb-4 text-white focus:outline-none">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+        <h3 class="text-lg font-semibold mb-4">Kategoriyalar</h3>
+        <div class="flex flex-col space-y-2">
+            <button class="category-filter bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition" data-category="all">Barcha Manga</button>
+            <button class="category-filter bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition" data-category="shonen">Shonen</button>
+            <button class="category-filter bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition" data-category="shojo">Shojo</button>
+            <button class="category-filter bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition" data-category="seinen">Seinen</button>
+            <button class="category-filter bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition" data-category="isekai">Isekai</button>
+            <hr class="my-4 border-purple-200">
+            <a href="#" id="mobileMenuProfileLink" class="hover:underline py-1 text-white">Profil</a>
+            <a href="#" id="mobileMenuCartLink" class="hover:underline py-1 text-white">Savat (<span id="mobileMenuCartCount">0</span>)</a>
+        </div>
+    </div>
+
+    <!-- Kategoriya Filtrlari (Desktop) -->
+    <section class="container mx-auto my-6 px-4 hidden sm:block">
+        <div class="flex flex-wrap gap-3 justify-center sm:justify-start">
+            <button class="category-filter bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition" data-category="all">Barcha Manga</button>
+            <button class="category-filter bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition" data-category="shonen">Shonen</button>
+            <button class="category-filter bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition" data-category="shojo">Shojo</button>
+            <button class="category-filter bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition" data-category="seinen">Seinen</button>
+            <button class="category-filter bg-purple-100 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-200 transition" data-category="isekai">Isekai</button>
+        </div>
+    </section>
+
+    <!-- Asosiy Kontent -->
+    <main class="container mx-auto my-8 px-4">
+        <h2 class="text-2xl font-semibold mb-6 text-center sm:text-left">Mashhur Mangalar</h2>
+        <div id="mangaGrid" class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <!-- Manga kartalari JavaScript orqali dinamik qo‘shiladi -->
+        </div>
+    </main>
+
+    <!-- Savat Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-10">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md">
+            <h2 class="text-xl font-semibold mb-4">Sizning Savatingiz</h2>
+            <div id="cartItems" class="mb-4"></div>
+            <p id="cartTotal" class="font-semibold mb-4">Jami: 0 UZS</p>
+            <div class="mb-4">
+                <input id="firstName" type="text" placeholder="Ism" class="w-full p-2 mb-2 border rounded">
+                <input id="lastName" type="text" placeholder="Familiya" class="w-full p-2 mb-2 border rounded">
+                <input id="address" type="text" placeholder="Manzil" class="w-full p-2 mb-2 border rounded">
+                <input id="phone" type="tel" placeholder="Telefon raqami (+998)" class="w-full p-2 mb-2 border rounded">
+                <button id="verifyPhone" class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition mb-2">Telefonni tasdiqlash</button>
+                <input id="smsCode" type="text" placeholder="SMS kodni kiriting" class="w-full p-2 mb-2 border rounded hidden">
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button id="closeCart" class="bg-gray-500 text-white px-4 py-2 rounded-full hover:bg-gray-600">Yopish</button>
+                <button id="checkout" class="bg-purple-700 text-white px-4 py-2 rounded-full hover:bg-purple-800">To‘lov qilish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chek Modal -->
+    <div id="receiptModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-10">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md">
+            <h2 class="text-xl font-semibold mb-4">To‘lov Cheki</h2>
+            <div id="receiptContent" class="mb-4"></div>
+            <div class="flex justify-end">
+                <button id="closeReceipt" class="bg-gray-500 text-white px-4 py-2 rounded-full hover:bg-gray-600">Yopish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profil Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-10">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md">
+            <h2 class="text-xl font-semibold mb-4">Sizning Profilingiz</h2>
+            <div class="mb-4">
+                <input id="profileFirstName" type="text" placeholder="Ism" class="w-full p-2 mb-2 border rounded">
+                <input id="profileLastName" type="text" placeholder="Familiya" class="w-full p-2 mb-2 border rounded">
+                <input id="profileAddress" type="text" placeholder="Manzil" class="w-full p-2 mb-2 border rounded">
+                <input id="profilePhone" type="tel" placeholder="Telefon raqami (+998)" class="w-full p-2 mb-2 border rounded">
+                <button id="verifyProfilePhone" class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition">Telefonni tasdiqlash</button>
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button id="saveProfile" class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700">Saqlash</button>
+                <button id="closeProfile" class="bg-gray-500 text-white px-4 py-2 rounded-full hover:bg-gray-600">Yopish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white p-6">
+        <div class="container mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Manga Bozor</h3>
+                <p class="text-gray-400">O‘zbekistondagi manga sevuvchilar uchun eng yaxshi do‘kon!</p>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Havolalar</h3>
+                <a href="#" class="block text-gray-400 hover:underline">Biz haqimizda</a>
+                <a href="#" class="block text-gray-400 hover:underline">Aloqa</a>
+                <a href="#" class="block text-gray-400 hover:underline">Foydalanish shartlari</a>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Aloqa</h3>
+                <p class="text-gray-400">Email: yordam@mangabozor.uz</p>
+                <p class="text-gray-400">Telefon: +998 71 123 45 67</p>
+            </div>
+        </div>
+        <p class="text-center text-gray-400 mt-6">© 2025 Manga Bozor. Barcha huquqlar himoyalangan.</p>
+    </footer>
+
+    <script>
+        // Manga ma'lumotlari
+        const mangaData = [
+            { id: 1, title: "Titanlarga hujum", price: 120000, category: "shonen", rating: 4, reviews: 123, image: "https://via.placeholder.com/150x200" },
+            { id: 2, title: "Bir Parcha", price: 150000, category: "shonen", rating: 5, reviews: 456, image: "https://via.placeholder.com/150x200" },
+            { id: 3, title: "Naruto", price: 110000, category: "shonen", rating: 4, reviews: 89, image: "https://via.placeholder.com/150x200" },
+            { id: 4, title: "Iblis ovchisi", price: 130000, category: "shonen", rating: 5, reviews: 321, image: "https://via.placeholder.com/150x200" },
+            { id: 5, title: "Mening qahramonim akademiyasi", price: 125000, category: "shonen", rating: 4, reviews: 200, image: "https://via.placeholder.com/150x200" },
+            { id: 6, title: "Fruits Basket", price: 115000, category: "shojo", rating: 5, reviews: 150, image: "https://via.placeholder.com/150x200" },
+            { id: 7, title: "Berserk", price: 140000, category: "seinen", rating: 4, reviews: 95, image: "https://via.placeholder.com/150x200" },
+            { id: 8, title: "Overlord", price: 135000, category: "isekai", rating: 4, reviews: 180, image: "https://via.placeholder.com/150x200" }
+        ];
+
+        // Savat va profil ma'lumotlari
+        let cart = [];
+        let profile = { firstName: "", lastName: "", address: "", phone: "" };
+        let generatedSMSCode = null;
+
+        // DOM elementlari
+        const mangaGrid = document.getElementById('mangaGrid');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilters = document.querySelectorAll('.category-filter');
+        const cartLink = document.getElementById('cartLink');
+        const mobileCartLink = document.getElementById('mobileCartLink');
+        const mobileMenuCartLink = document.getElementById('mobileMenuCartLink');
+        const cartCount = document.getElementById('cartCount');
+        const mobileCartCount = document.getElementById('mobileCartCount');
+        const mobileMenuCartCount = document.getElementById('mobileMenuCartCount');
+        const cartModal = document.getElementById('cartModal');
+        const cartItems = document.getElementById('cartItems');
+        const cartTotal = document.getElementById('cartTotal');
+        const closeCart = document.getElementById('closeCart');
+        const checkout = document.getElementById('checkout');
+        const firstName = document.getElementById('firstName');
+        const lastName = document.getElementById('lastName');
+        const address = document.getElementById('address');
+        const phone = document.getElementById('phone');
+        const verifyPhone = document.getElementById('verifyPhone');
+        const smsCode = document.getElementById('smsCode');
+        const receiptModal = document.getElementById('receiptModal');
+        const receiptContent = document.getElementById('receiptContent');
+        const closeReceipt = document.getElementById('closeReceipt');
+        const profileLink = document.getElementById('profileLink');
+        const mobileProfileLink = document.getElementById('mobileProfileLink');
+        const mobileMenuProfileLink = document.getElementById('mobileMenuProfileLink');
+        const profileModal = document.getElementById('profileModal');
+        const profileFirstName = document.getElementById('profileFirstName');
+        const profileLastName = document.getElementById('profileLastName');
+        const profileAddress = document.getElementById('profileAddress');
+        const profilePhone = document.getElementById('profilePhone');
+        const verifyProfilePhone = document.getElementById('verifyProfilePhone');
+        const saveProfile = document.getElementById('saveProfile');
+        const closeProfile = document.getElementById('closeProfile');
+        const menuToggle = document.getElementById('menuToggle');
+        const closeMenu = document.getElementById('closeMenu');
+        const sideMenu = document.getElementById('sideMenu');
+
+        // Manga kartalarini ko‘rsatish
+        function displayManga(mangaList) {
+            mangaGrid.innerHTML = '';
+            mangaList.forEach(manga => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition';
+                card.innerHTML = `
+                    <img src="${manga.image}" alt="Manga Muqovasi" class="w-full h-40 object-cover rounded">
+                    <h3 class="text-md font-semibold mt-2 truncate">${manga.title}</h3>
+                    <p class="text-gray-600 text-sm">${manga.price.toLocaleString()} UZS</p>
+                    <div class="flex items-center mt-2">
+                        <span class="text-yellow-400">${'★'.repeat(manga.rating)}${'☆'.repeat(5 - manga.rating)}</span>
+                        <span class="text-gray-500 text-xs ml-2">(${manga.reviews})</span>
+                    </div>
+                    <button class="add-to-cart mt-3 w-full bg-purple-700 text-white py-2 rounded-full hover:bg-purple-800 transition" data-id="${manga.id}">Savatga qo‘shish</button>
+                `;
+                mangaGrid.appendChild(card);
+            });
+
+            // Savatga qo‘shish tugmalari
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', () => {
+                    const mangaId = parseInt(button.getAttribute('data-id'));
+                    addToCart(mangaId);
+                });
+            });
+        }
+
+        // Savatga qo‘shish
+        function addToCart(mangaId) {
+            const manga = mangaData.find(item => item.id === mangaId);
+            const cartItem = cart.find(item => item.id === mangaId);
+            if (cartItem) {
+                cartItem.quantity += 1;
+            } else {
+                cart.push({ ...manga, quantity: 1 });
+            }
+            updateCart();
+            alert(`${manga.title} savatga qo‘shildi!`);
+        }
+
+        // Savatni yangilash
+        function updateCart() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            mobileCartCount.textContent = totalItems;
+            mobileMenuCartCount.textContent = totalItems;
+            cartItems.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                const itemElement = document.createElement('div');
+                itemElement.className = 'flex justify-between mb-2';
+                itemElement.innerHTML = `
+                    <span>${item.title} (x${item.quantity})</span>
+                    <span>${(item.price * item.quantity).toLocaleString()} UZS</span>
+                `;
+                cartItems.appendChild(itemElement);
+            });
+            cartTotal.textContent = `Jami: ${total.toLocaleString()} UZS`;
+        }
+
+        // SMS kod generatsiyasi
+        function generateSMSCode() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
+
+        // Telefon tasdiqlash (Savat)
+        verifyPhone.addEventListener('click', () => {
+            if (phone.value.match(/^\+998\d{9}$/)) {
+                generatedSMSCode = generateSMSCode();
+                smsCode.classList.remove('hidden');
+                alert(`Sizning SMS kodingiz: ${generatedSMSCode}`);
+            } else {
+                alert('Iltimos, to‘g‘ri telefon raqami kiriting (+998 formatida)!');
+            }
+        });
+
+        // Telefon tasdiqlash (Profil)
+        verifyProfilePhone.addEventListener('click', () => {
+            if (profilePhone.value.match(/^\+998\d{9}$/)) {
+                const smsCode = generateSMSCode();
+                alert(`Sizning SMS kodingiz: ${smsCode}`);
+                profile.phone = profilePhone.value;
+            } else {
+                alert('Iltimos, to‘g‘ri telefon raqami kiriting (+998 formatida)!');
+            }
+        });
+
+        // Profilni saqlash
+        saveProfile.addEventListener('click', () => {
+            if (profileFirstName.value && profileLastName.value && profileAddress.value && profilePhone.value) {
+                profile = {
+                    firstName: profileFirstName.value,
+                    lastName: profileLastName.value,
+                    address: profileAddress.value,
+                    phone: profilePhone.value
+                };
+                alert('Profil ma’lumotlari saqlandi!');
+                profileModal.classList.add('hidden');
+            } else {
+                alert('Iltimos, barcha maydonlarni to‘ldiring!');
+            }
+        });
+
+        // Chekni ko‘rsatish
+        function showReceipt() {
+            let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            let receiptItems = cart.map(item => `
+                <div class="flex justify-between mb-2">
+                    <span>${item.title} (x${item.quantity})</span>
+                    <span>${(item.price * item.quantity).toLocaleString()} UZS</span>
+                </div>
+            `).join('');
+            receiptContent.innerHTML = `
+                <p><strong>Ism:</strong> ${firstName.value}</p>
+                <p><strong>Familiya:</strong> ${lastName.value}</p>
+                <p><strong>Manzil:</strong> ${address.value}</p>
+                <p><strong>Telefon:</strong> ${phone.value}</p>
+                <hr class="my-4">
+                <h3 class="text-lg font-semibold mb-2">Buyurtma:</h3>
+                ${receiptItems}
+                <p class="font-semibold mt-4">Jami: ${total.toLocaleString()} UZS</p>
+                <p class="text-sm text-gray-500 mt-2">Sana: ${new Date().toLocaleString('uz-UZ')}</p>
+            `;
+            receiptModal.classList.remove('hidden');
+            cartModal.classList.add('hidden');
+        }
+
+        // Qidiruv
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            const filteredManga = mangaData.filter(manga => manga.title.toLowerCase().includes(query));
+            displayManga(filteredManga);
+        });
+
+        // Kategoriya filtrlari
+        categoryFilters.forEach(button => {
+            button.addEventListener('click', () => {
+                const category = button.getAttribute('data-category');
+                const filteredManga = category === 'all' ? mangaData : mangaData.filter(manga => manga.category === category);
+                displayManga(filteredManga);
+                categoryFilters.forEach(btn => btn.classList.remove('bg-purple-300'));
+                button.classList.add('bg-purple-300');
+                sideMenu.classList.add('-translate-x-full');
+            });
+        });
+
+        // Savat modalini ochish/yopish
+        cartLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            cartModal.classList.toggle('hidden');
+        });
+
+        mobileCartLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            cartModal.classList.toggle('hidden');
+        });
+
+        mobileMenuCartLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            cartModal.classList.toggle('hidden');
+            sideMenu.classList.add('-translate-x-full');
+        });
+
+        closeCart.addEventListener('click', () => {
+            cartModal.classList.add('hidden');
+        });
+
+        // Profil modalini ochish/yopish
+        profileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            profileFirstName.value = profile.firstName;
+            profileLastName.value = profile.lastName;
+            profileAddress.value = profile.address;
+            profilePhone.value = profile.phone;
+            profileModal.classList.toggle('hidden');
+        });
+
+        mobileProfileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            profileFirstName.value = profile.firstName;
+            profileLastName.value = profile.lastName;
+            profileAddress.value = profile.address;
+            profilePhone.value = profile.phone;
+            profileModal.classList.toggle('hidden');
+        });
+
+        mobileMenuProfileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            profileFirstName.value = profile.firstName;
+            profileLastName.value = profile.lastName;
+            profileAddress.value = profile.address;
+            profilePhone.value = profile.phone;
+            profileModal.classList.toggle('hidden');
+            sideMenu.classList.add('-translate-x-full');
+        });
+
+        closeProfile.addEventListener('click', () => {
+            profileModal.classList.add('hidden');
+        });
+
+        // Chek modalini yopish
+        closeReceipt.addEventListener('click', () => {
+            receiptModal.classList.add('hidden');
+        });
+
+        // To‘lov
+        checkout.addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert('Savat bo‘sh!');
+            } else if (!firstName.value || !lastName.value || !address.value || !phone.value) {
+                alert('Iltimos, barcha maydonlarni to‘ldiring!');
+            } else if (!phone.value.match(/^\+998\d{9}$/)) {
+                alert('Iltimos, to‘g‘ri telefon raqami kiriting (+998 formatida)!');
+            } else if (!smsCode.value || smsCode.value !== generatedSMSCode) {
+                alert('Iltimos, to‘g‘ri SMS kodni kiriting!');
+            } else {
+                showReceipt();
+                cart = [];
+                firstName.value = '';
+                lastName.value = '';
+                address.value = '';
+                phone.value = '';
+                smsCode.value = '';
+                smsCode.classList.add('hidden');
+                generatedSMSCode = null;
+                updateCart();
+            }
+        });
+
+        // Yon menyuni ochish/yopish
+        menuToggle.addEventListener('click', () => {
+            sideMenu.classList.toggle('-translate-x-full');
+        });
+
+        closeMenu.addEventListener('click', () => {
+            sideMenu.classList.add('-translate-x-full');
+        });
+
+        // Dastlabki manga ro‘yxati
+        displayManga(mangaData);
+    </script>
+</body>
+</html>
